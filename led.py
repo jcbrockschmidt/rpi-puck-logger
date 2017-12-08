@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
+# GPIO pin that controls LED
+# 3.3V corresponds to LED on, and 0V to LED off
+# Feel free to change this
 PIN = 8
+
+# Time elapse (in seconds) between on and off during blinking
+# Feel free to change this
 DELAY = 1
+
 
 import sys
 

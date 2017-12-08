@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
 
+# Parent directory
+# DO NOT change this
+DIR=$(dirname "$(readlink -f "$0")")
+
+
+# Directory to dump collected data in
+# Feel free to change this
+DUMPDIR="$DIR/dump"
+
+
+# Directory to put temporary files
+# I mean, you could change this
+# But why would you want to?
 TMPDIR="/tmp/rpipucklogger"
-TMPBLK="$TMPDIR/blink.pid"
+
+# Make sure directories exist
+mkdir -p $DUMPDIR
+mkdir -p $TMPDIR
+
 # Starts LED blinking
-blink () {
+TMPBLK="$TMPDIR/blink.pid"
+stopblink () {
     # Kill blinking process if it exists
     if [[ -e $TMPBLK ]]
     then
@@ -14,6 +32,9 @@ blink () {
 	    kill $BLKPID
 	fi
     fi
+}
+blink () {
+    stopblink
     $DIR/led.py blink &
     echo $! > $TMPBLK
 }
@@ -45,8 +66,7 @@ then
 fi
 
 # Test if interface is capturing packets
-DIR=$(dirname "$(readlink -f "$0")")
-mkdir -p $TMPDIR
+stopblink
 DATE=$(date +"%F_%k%M%S")
 TEST="$TMPDIR/puck_$DATE.pcap"
 timeout 5s tcpdump -i $INTER -w $TEST
@@ -60,7 +80,7 @@ then
 fi
 
 # Capture packets and write to $DUMP
-DUMP="$DIR/$DATE.pcap"
+DUMP="$DUMPDIR/$DATE.pcap"
 echo "Recording packets from $INTER and writing to $DUMP"
 $DIR/led.py on
 tcpdump -w $DUMP -i $INTER
