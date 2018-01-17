@@ -39,6 +39,8 @@ blink () {
     echo $! > $TMPBLK
 }
 
+echo "$(date): Attempting to start logging..."
+
 # Make sure script is being run as sudo
 if [[ $UID != 0 ]]
 then
@@ -71,7 +73,7 @@ DATE=$(date +"%F_%k%M%S")
 TEST="$TMPDIR/puck_$DATE.pcap"
 timeout 5s tcpdump -i $INTER -w $TEST
 NUMPACKS=$(tcpdump -r $TEST 2> /dev/null | wc -l)
-rm -f $TEST
+rm -f $TEST &
 if [ $NUMPACKS -lt 1 ]
 then
     echo "No packets are being captured through $INTER"
@@ -80,7 +82,8 @@ then
 fi
 
 # Capture packets and write to $DUMP
+DATE=$(date +"%F_%k%M%S")
 DUMP="$DUMPDIR/$DATE.pcap"
-echo "Recording packets from $INTER and writing to $DUMP"
+echo "$(date): Recording packets from $INTER and writing to $DUMP"
 $DIR/led.py on
 tcpdump -w $DUMP -i $INTER
