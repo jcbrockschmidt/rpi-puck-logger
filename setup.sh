@@ -15,6 +15,14 @@ then
     exit 1
 fi
 
+# Make sure log file directory is specified
+if [ -z $2 ]
+then
+    echo "Please specify a directory to store log files in"
+    exit 1
+fi
+LOGDIR=$(readlink -f "$2")
+
 # Link to init script in /etc/init.d
 DIR=$(dirname "$(readlink -f "$0")")
 START="$DIR/start.sh"
@@ -35,14 +43,13 @@ cat > $INIT << EOF
 
 case \$1 in
   start)
-    $START $INTER &
+    DATE=\$(date +"%F_%k%M%S")
+    $START $INTER > $LOGDIR/\$DATE.log 2>&1 &
     ;;
   *)
     echo "Usage: $INIT start"
     ;;
 esac
-
-echo \$1 >> /home/pi/log.txt
 
 exit 0
 EOF

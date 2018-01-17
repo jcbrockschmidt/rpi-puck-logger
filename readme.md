@@ -23,12 +23,12 @@ Logs packet data collected from a Velodyne Puck LITE
    - By default, the directory for dumping data is "dump" inside the parent directory
    - This can be changed by changing ```$DUMPDIR``` in ```start.sh``` near the top of the file to your desired dump directory
  * Setup auto-logging
-   - Run ```setup.sh``` with the name of the interface data will be streamed to. For example, if your interface is ```eth0```, run
+   - Run ```setup.sh``` with the name of the interface data will be streamed to and the directory to write logs to. For example, if your interface is ```eth0``` and you want to write logs to ```~/logs/```, run
     ```
-    sudo ./setup.sh eth0
+    sudo ./setup.sh eth0 ~/logs/
     ```
    - This will make ```start.sh``` run on bootup
-   - Logged files will timestamped and placed in your dump directory
+   - Data files will timestamped and placed in your dump directory
  * Manual logging
    - If you want to start data logging manually, simply run ```start.sh``` with the name of the interface data is being streamed to. For example, if your interface is ```eth0```, run
     ```
