@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Parent directory
 # DO NOT change this
 DIR=$(dirname "$(readlink -f "$0")")
@@ -62,8 +63,15 @@ exitscript () {
     fi
     stopblink
     ledoff
+    sleep 0.1
 }
 trap exitscript SIGINT SIGTERM
+
+# Waits for a button pressm then terminates the program
+waitbutton () {
+    $DIR/waitbutton.py
+    kill $$
+}
 
 
 echo "$(date): Attempting to start logging..."
@@ -72,7 +80,6 @@ echo "$(date): Attempting to start logging..."
 if [[ $UID != 0 ]]
 then
     echo "Please run this script as root"
-    blink
     exit 1
 fi
 
@@ -82,6 +89,7 @@ if [ -z $INTER ]
 then
     echo "Please specify an interface to capture packets from (e.g. eth0)"
     blink
+    sleep 0.1
     exit 1
 fi
 
@@ -91,23 +99,24 @@ if [ $? -ne 0 ]
 then
     echo "$(date): Error with $INTER detected"
     blink
+    sleep 0.1
     exit 1
 fi
 
 # Test if interface is capturing packets
+echo "$(date): Testing interface for packet traffic..."
 stopblink
-ledoff
 DATE=$(date +"%F_%k%M%S")
 TEST="$TMPDIR/puck_$DATE.pcap"
-timeout 5s tcpdump -i $INTER -w $TEST
-NUMPACKS=$(tcpdump -r $TEST 2> /dev/null | wc -l)
+timeout 3s tcpdump -i $INTER -w $TEST 2>/dev/null
+NUMPACKS=$(tcpdump -r $TEST 2>/dev/null | wc -l)
 rm -f $TEST &
 if [ $NUMPACKS -lt 1 ]
 then
     echo "$(date): No packets are being captured through $INTER"
     echo "$(date): Data logging cannot commence"
     blink
-    sleep 0.5
+    sleep 0.1
     exit 1
 fi
 
@@ -118,6 +127,8 @@ echo "$(date): Recording packets from $INTER and writing to $DUMP"
 ledon
 tcpdump -w $DUMP -i $INTER &
 CHILD=$!
+
+# Wait for data logging to stop, or for a button press
+waitbutton &
 wait $CHILD
 stopblink
-ledoff

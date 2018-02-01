@@ -36,8 +36,11 @@ Logs packet data collected from a Velodyne Puck LITE
     ```
    - A timestamped file will be created in your dump directory
  * *Optional*: LED status indicator
-   - You attach an LED circuit to a GPIO pin to receive feedback about logging status
+   - You can attach an LED circuit to a GPIO pin to receive feedback about logging status
      * The LED will turn on when logging has started
      * The LED will blink when something has gone wrong and logging has no commenced
-   - The GPIO pin is 8 by default. But this can be changed by changing the variable ```GPIO``` at the top of ```led.py```.
+   - The GPIO pin is 8 by default. This can be changed by changing the variable ```PIN``` at the top of ```led.py```.
      * Note that 3.3V is LED on and 0V is LED off. Design your circuit accordingly
+ * *Optional*: Button interrupt
+   - You can attach a push button to a GPIO pin which will terminate data recording when pressed
+   - The GPIO pin is GPIO 18 by default. This can be changed by changing the variable ```PIN``` at the top of ```waitbutton.py```.
