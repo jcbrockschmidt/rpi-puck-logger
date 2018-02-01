@@ -37,26 +37,31 @@ def catchTerm(signal, frame):
     cancelBlink()
     sys.exit(0)
 
-if sys.argv[1] == "on":
-    print("Turning LED on")
-    GPIO.output(PIN, GPIO.HIGH)
+def main():
+    if sys.argv[1] == "on":
+        print("Turning LED on")
+        GPIO.output(PIN, GPIO.HIGH)
 
-elif sys.argv[1] == "off":
-    print("Turning LED off")
-    GPIO.output(PIN, GPIO.LOW)
-    GPIO.cleanup()
+    elif sys.argv[1] == "off":
+        print("Turning LED off")
+        GPIO.output(PIN, GPIO.LOW)
+        GPIO.cleanup()
 
-elif sys.argv[1] == "blink":
-    print("Blinking LED")
-    signal.signal(signal.SIGTERM, catchTerm)
-    try:
-        while True:
-            GPIO.output(PIN, True)
-            time.sleep(DELAY)
-            GPIO.output(PIN, False)
-            time.sleep(DELAY)
-    except KeyboardInterrupt:
-        cancelBlink()
+    elif sys.argv[1] == "blink":
+        print("Blinking LED")
+        signal.signal(signal.SIGTERM, catchTerm)
+        signal.signal(signal.SIGINT, catchTerm)
+        try:
+            while True:
+                GPIO.output(PIN, True)
+                time.sleep(DELAY)
+                GPIO.output(PIN, False)
+                time.sleep(DELAY)
+        except KeyboardInterrupt:
+            cancelBlink()
 
-else:
-    print("Invalid argument: {}".format(sys.argv[1]))
+    else:
+        print("Invalid argument: {}".format(sys.argv[1]))
+
+if __name__ == "__main__":
+    main()
