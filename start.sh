@@ -7,7 +7,12 @@ DIR=$(dirname "$(readlink -f "$0")")
 
 # Directory to dump collected data in
 # Feel free to change this
-DUMPDIR="$DIR/dump"
+DUMPDIR="/mnt/pucklogs/data"
+
+
+# Whether the system is shutdown when the button is pressed.
+# Either 1 or 0 (true and false).
+BTNPOWEROFF=1
 
 
 # Directory to put temporary files
@@ -41,6 +46,7 @@ stopblink () {
 	if [[ $PINFO == *"led.py"* ]]
 	then
 	    kill $BLKPID
+	    rm $TMPBLK
 	fi
     fi
 }
@@ -53,23 +59,34 @@ blink () {
 }
 
 # Cleanly terminates the program
+DOPOWEROFF=0
 exitscript () {
     echo "$(date): SIGINT or SIGTERM detected"
     trap - SIGINT SIGTERM
-    if [ -z ${CHILD+x} ]
+    if ! [ -z ${CHILD+x} ]
     then
 	echo "$(date): Terminating data logging..."
 	kill $CHILD
+	wait $CHILD
     fi
     stopblink
     ledoff
     sleep 0.1
+    if [ $DOPOWEROFF -eq 1 ]
+    then
+	poweroff
+    fi
+    exit 1
 }
 trap exitscript SIGINT SIGTERM
 
-# Waits for a button pressm then terminates the program
+# Waits for a button pressm then terminates the program and powers the computer down
 waitbutton () {
     $DIR/waitbutton.py
+    if [ $BTNPOWEROFF -eq 1 ]
+    then
+	DOPOWEROFF=1
+    fi
     kill $$
 }
 
@@ -116,8 +133,7 @@ then
     echo "$(date): No packets are being captured through $INTER"
     echo "$(date): Data logging cannot commence"
     blink
-    sleep 0.1
-    exit 1
+    waitbutton
 fi
 
 # Capture packets and write to $DUMP
