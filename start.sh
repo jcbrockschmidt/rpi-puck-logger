@@ -74,6 +74,7 @@ exitscript () {
     sleep 0.1
     if [ $DOPOWEROFF -eq 1 ]
     then
+	echo "$(date): Powering off computer..."
 	poweroff
     fi
     exit 1
@@ -87,7 +88,7 @@ waitbutton () {
     then
 	DOPOWEROFF=1
     fi
-    kill $$
+    exitscript
 }
 
 
