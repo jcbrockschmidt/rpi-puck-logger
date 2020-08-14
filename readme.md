@@ -11,7 +11,7 @@ Logs packet data collected from a Velodyne Puck LITE
    - You will likely want to format the partition that you will be storing your collected data on to FAT32 so data can be easily retrieved from Windows and OS X
  * Establish and internet connection and install the necessary packages with
     ```
-    sudo apt install python3-dev python3-rpi.gpio git
+    sudo apt install python3-dev python3-rpi.gpio git tcpdump
     ```
  * Clone the rpi-puck-logger repository
    - I recommend just putting it in your home directory
